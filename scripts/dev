@@ -1,0 +1,69 @@
+#!/bin/bash
+# Explicit launcher: no shell activation or user/global configuration needed.
+set -euo pipefail
+ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+umask 077
+
+# Refuse redirected infrastructure directories before creating/using them.
+for dir in .local .cache .config .local/bin .local/home .local/share .local/state \
+  .local/reports .local/share/uv .local/share/uv/python .local/share/mise \
+  .local/share/mise/installs .local/state/mise .cache/tmp .cache/bootstrap \
+  .cache/uv .cache/mise .cache/huggingface .cache/huggingface/hub \
+  .cache/huggingface/assets .cache/huggingface/xet .cache/npm .cache/pycache \
+  .config/npm .config/git .config/mise .config/matplotlib .config/curl; do
+  if [ -L "$ROOT/$dir" ]; then
+    echo "Refusing symlinked project directory: $dir" >&2
+    exit 1
+  fi
+  mkdir -p "$ROOT/$dir"
+done
+for file in .venv .local/bin/uv .local/bin/uvx .local/bin/mise \
+  .config/npm/npmrc .config/npm/global-npmrc .config/git/config; do
+  if [ -L "$ROOT/$file" ]; then
+    echo "Refusing symlinked project infrastructure: $file" >&2
+    exit 1
+  fi
+done
+
+export MACINTENT_ROOT="$ROOT"
+export MACINTENT_LAUNCHER_ACTIVE=1
+export HOME="$ROOT/.local/home"
+export PATH="$ROOT/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export TMPDIR="$ROOT/.cache/tmp" TMP="$ROOT/.cache/tmp" TEMP="$ROOT/.cache/tmp"
+export XDG_CACHE_HOME="$ROOT/.cache" XDG_CONFIG_HOME="$ROOT/.config"
+export XDG_DATA_HOME="$ROOT/.local/share" XDG_STATE_HOME="$ROOT/.local/state"
+export UV_CACHE_DIR="$ROOT/.cache/uv"
+export UV_PYTHON_INSTALL_DIR="$ROOT/.local/share/uv/python"
+export UV_PYTHON_BIN_DIR="$ROOT/.local/bin"
+export UV_PYTHON_PREFERENCE=only-managed
+export UV_PROJECT_ENVIRONMENT="$ROOT/.venv"
+export MISE_DATA_DIR="$ROOT/.local/share/mise"
+export MISE_INSTALLS_DIR="$ROOT/.local/share/mise/installs"
+export MISE_CACHE_DIR="$ROOT/.cache/mise"
+export MISE_CONFIG_DIR="$ROOT/.config/mise"
+export MISE_STATE_DIR="$ROOT/.local/state/mise"
+export NPM_CONFIG_CACHE="$ROOT/.cache/npm"
+export NPM_CONFIG_USERCONFIG="$ROOT/.config/npm/npmrc"
+export NPM_CONFIG_GLOBALCONFIG="$ROOT/.config/npm/global-npmrc"
+export NPM_CONFIG_PREFIX="$ROOT/.local/npm-global"
+export CURL_HOME="$ROOT/.config/curl"
+export HF_HOME="$ROOT/.cache/huggingface"
+export HF_HUB_CACHE="$HF_HOME/hub" HF_ASSETS_CACHE="$HF_HOME/assets"
+export HF_XET_CACHE="$HF_HOME/xet"
+export HF_TOKEN_PATH="$HF_HOME/token" HF_HUB_DISABLE_IMPLICIT_TOKEN=1
+export HF_HUB_DISABLE_TELEMETRY=1 DO_NOT_TRACK=1
+export PYTHONNOUSERSITE=1
+export PYTHONPYCACHEPREFIX="$ROOT/.cache/pycache"
+export MPLCONFIGDIR="$ROOT/.config/matplotlib"
+export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL="$ROOT/.config/git/config"
+export NO_PROXY="127.0.0.1,localhost,::1${NO_PROXY:+,$NO_PROXY}"
+unset PYTHONPATH PYTHONHOME PYTHONSTARTUP NODE_PATH NODE_OPTIONS
+unset HF_TOKEN HUGGING_FACE_HUB_TOKEN UV_CONFIG_FILE UV_WORKING_DIRECTORY UV_PROJECT
+export PYTHONPATH="$ROOT/src"
+
+cd "$ROOT"
+if [ "$#" -eq 0 ]; then
+  echo "Usage: ./scripts/dev COMMAND [ARGUMENTS...]" >&2
+  exit 2
+fi
+exec "$@"

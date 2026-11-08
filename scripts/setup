@@ -1,0 +1,16 @@
+#!/bin/bash
+# Explicit dependency setup only. No model download, microphone or action.
+set -euo pipefail
+[ ! -L "${BASH_SOURCE[0]}" ] || { echo 'Refusing symlinked setup launcher.' >&2; exit 1; }
+ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ "$1" != --with-node ]; }; then
+  echo 'Usage: ./scripts/setup [--with-node]' >&2
+  exit 2
+fi
+if [ ! -x "$ROOT/.local/bin/uv" ] || { [ "$#" -eq 1 ] && [ ! -x "$ROOT/.local/bin/mise" ]; }; then
+  /bin/bash "$ROOT/scripts/dev" /bin/bash "$ROOT/scripts/bootstrap.sh" "$@"
+elif [ "$#" -eq 1 ]; then
+  /bin/bash "$ROOT/scripts/dev" mise trust "$ROOT/mise.toml"
+  /bin/bash "$ROOT/scripts/dev" mise install node
+fi
+exec /bin/bash "$ROOT/scripts/dev" uv sync --locked

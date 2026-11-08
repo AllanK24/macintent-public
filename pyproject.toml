@@ -1,0 +1,21 @@
+[project]
+name = "macintent"
+version = "0.1.0"
+description = "Supervised voice-to-action workspace app for Apple Silicon macOS"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "parakeet-mlx==0.5.2",
+    "mlx==0.32.3",
+    "huggingface-hub==1.33.0",
+    "numpy==2.5.3",
+]
+
+[dependency-groups]
+dev = ["pytest==9.1.1"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

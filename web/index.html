@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#070d20">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; media-src 'none'; worker-src 'none'; font-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none';">
+    <title>MacIntent</title>
+    <link rel="icon" href="/mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/live.css">
+    <script type="module" src="/app.mjs"></script>
+  </head>
+  <body>
+    <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <symbol id="i-orbit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><ellipse cx="12" cy="12" rx="12" ry="5" transform="rotate(-35 12 12)"/><circle cx="20" cy="5" r="1"/></symbol>
+      <symbol id="i-stars" viewBox="0 0 24 24"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4Z"/><path d="m20 2 .6 1.4L22 4l-1.4.6L20 6l-.6-1.4L18 4l1.4-.6Z"/></symbol>
+      <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z"/><path d="m8 12 3 3 5-6"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7V5h6l2 3h10v12H3Z"/></symbol>
+      <symbol id="i-note" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8Zm0 0v5h5M8 12h8M8 16h6"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></symbol>
+      <symbol id="i-delete" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></symbol>
+      <symbol id="i-code" viewBox="0 0 24 24"><path d="m7 7-5 5 5 5m10-10 5 5-5 5M14 3l-4 18"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 4 12 8-12 8Z"/></symbol>
+      <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12M3 6h1M3 12h1M3 18h1"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 6 6 6-6 6m9 0h8"/></symbol>
+    </svg>
+    <div class="cosmos" aria-hidden="true"></div>
+    <div id="workspace-layout" class="workspace-layout">
+    <div id="main-surface" class="main-surface">
+    <div class="preview-banner connection-banner"><strong>LOCAL SPEECH · GROQ PLANNING</strong><span>Only text you submit leaves this Mac. Every write and run stays under your control.</span></div>
+    <div class="app-shell">
+      <header class="app-header">
+        <a class="brand" href="/" aria-label="MacIntent home"><span class="brand-mark"><svg class="icon"><use href="#i-orbit"/></svg></span><span>Mac<span class="brand-light">Intent</span><small>VOICE TO POSSIBILITY</small></span></a>
+        <div class="header-actions"><div class="connection-indicator"><span id="connection-dot" class="status-dot" data-state="off"></span><span id="connection-label" class="small-muted">Not connected</span><button id="connection-button" class="text-button">Connect</button></div><button id="open-scenarios" class="button button-secondary" aria-controls="scenario-panel" aria-expanded="false"><svg class="icon"><use href="#i-stars"/></svg>Test scenarios<span id="scenario-count" class="key-hint"></span></button></div>
+      </header>
+      <main>
+        <section class="intro" aria-labelledby="page-title"><div><p class="eyebrow">YOUR IDEAS, SET IN MOTION</p><h1 id="page-title">Your voice. <span>In orbit.</span></h1><p class="intro-copy">Speak naturally. Review precisely. Stay in control.</p></div><div class="workspace-pill"><svg class="icon"><use href="#i-folder"/></svg><span><small>WORKSPACE BOUNDARY</small><code>demo/workspace</code></span><svg class="icon tiny-icon"><use href="#i-shield"/></svg></div></section>
+        <div id="session-notice" class="session-notice" role="status" hidden></div>
+        <nav class="journey" aria-label="Request progress"><ol><li data-stage="0"><span class="stage-number">01</span><span>Capture</span></li><li data-stage="1"><span class="stage-number">02</span><span>Review request</span></li><li data-stage="2"><span class="stage-number">03</span><span>Review action</span></li><li data-stage="3"><span class="stage-number">04</span><span>See result</span></li></ol><span class="journey-note"><svg class="icon"><use href="#i-shield"/></svg>Always your call</span></nav>
+        <div class="workspace-grid">
+          <section class="panel request-panel" aria-labelledby="request-title">
+            <div class="panel-heading"><div class="heading-with-icon"><span class="section-icon"><svg class="icon"><use href="#i-mic"/></svg></span><h2 id="request-title">Your request</h2></div><button id="new-request" class="text-button" disabled><svg class="icon"><use href="#i-plus"/></svg>New request</button></div>
+            <div id="capture-strip" class="capture-strip"><button id="record-button" class="record-button" aria-label="Record one command" aria-describedby="capture-description" disabled><svg class="icon"><use href="#i-mic"/></svg></button><div class="capture-copy"><strong id="capture-label">A space for your next idea</strong><span id="capture-description">Connect first. Your microphone stays off until Record.</span></div><div class="waveform" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="transcript-heading"><label class="field-label" for="transcript">ORIGINAL TRANSCRIPT</label><span id="transcript-badge" class="subtle-badge">Memory only</span></div>
+            <textarea id="transcript" class="transcript" rows="4" readonly placeholder="Your words will appear here after local transcription." aria-describedby="transcript-help"></textarea><p id="transcript-help" class="field-help"><svg class="icon"><use href="#i-shield"/></svg>Original words stay intact. Add corrections below.</p>
+            <div class="corrections-heading"><label class="field-label" for="correction-input">REVIEW NOTES <span>OPTIONAL</span></label><span id="correction-count" class="correction-count">0 / 8 · 0 / 2048 characters</span></div><div id="correction-notes" class="correction-notes"></div><form id="correction-form" class="correction-form"><input id="correction-input" maxlength="2048" placeholder="e.g. The folder name is Starboard Bay" autocomplete="off" disabled><button id="add-correction" class="icon-button" type="submit" aria-label="Add a correction note" disabled><svg class="icon"><use href="#i-plus"/></svg></button></form><p class="field-help">Only this recording's original and ordered notes go to Groq. No previous requests are included.</p>
+            <p class="field-help">Use + or Enter to add a note. Send also includes a note still in this field.</p><div class="request-actions"><button id="cancel-request" class="text-button" disabled>Cancel request</button><button id="send-request" class="button button-primary" disabled>Send to Groq<svg class="icon"><use href="#i-arrow"/></svg></button></div><p class="privacy-caption"><span class="status-dot"></span>Mic off during ASR, review, planning and approvals.</p><p class="field-help">Each request has a five-minute limit from Record; every approval also expires separately.</p>
+          </section>
+          <section class="panel action-panel" aria-labelledby="action-title"><div class="panel-heading"><div class="heading-with-icon"><span class="section-icon"><svg class="icon"><use href="#i-orbit"/></svg></span><h2 id="action-title">Action review</h2></div><span id="action-badge" class="badge">Your call</span></div><div id="action-content" class="action-content"></div></section>
+        </div>
+        <section class="panel results-panel" aria-labelledby="results-title"><div class="panel-heading"><div class="heading-with-icon"><span class="section-icon"><svg class="icon"><use href="#i-terminal"/></svg></span><h2 id="results-title">The outcome</h2><span id="result-count" class="result-count">No steps completed</span></div><span class="results-caption">Observed results · no automatic retries</span></div><div id="results-content"></div></section>
+        <div class="capability-line"><span>ONE ASSISTANT. NO EXTRA MODES.</span><p>List <b>·</b> Create <b>·</b> Copy <b>·</b> Delete <b>·</b> Python <b>·</b> Multi-step plans</p></div>
+      </main>
+      <footer class="app-footer"><span><svg class="icon"><use href="#i-shield"/></svg>No speech logs by default. Approved files and metadata audit persist.</span><span>Closing or hiding this page stops future work—not completed effects.</span></footer>
+    </div>
+    </div>
+    <aside id="scenario-panel" class="scenario-drawer scenario-sidebar" aria-labelledby="scenario-title" aria-describedby="scenario-disclaimer" hidden>
+      <div class="sidebar-heading"><div><p class="eyebrow">THE GUIDED WALKTHROUGH</p><h2 id="scenario-title">Test scenarios</h2></div><button id="close-scenarios" class="icon-button" aria-label="Hide test scenarios"><svg class="icon"><use href="#i-close"/></svg></button></div>
+      <div id="sidebar-capture-status" class="sidebar-capture-status" role="status" aria-live="polite"><strong id="sidebar-capture-label">Microphone off</strong><p id="sidebar-capture-help">Use Record in the main pane, then wait for Listening before speaking.</p></div>
+      <div id="scenario-scroll" class="scenario-scroll">
+      <p id="scenario-disclaimer" class="drawer-description">Read alongside the app. This panel never records, submits or approves a request for you.</p>
+      <div class="scenario-progress"><span id="scenario-position"></span><span id="scenario-reviewed">0 reviewed</span></div><progress id="scenario-progress-bar" value="0" aria-label="Scenarios with a manual verdict"></progress>
+      <details class="scenario-setup"><summary>Demo folder reference</summary><div class="scenario-root"><label for="scenario-root">Example folder (reference text only)</label><input id="scenario-root" maxlength="64" autocomplete="off"><p>Use a fresh unused name. If you approve a different name, update this reference yourself. Nothing is created, looked up or sent by this field.</p></div></details>
+      <label class="field-label scenario-picker-label" for="scenario-picker">JUMP TO A SCENARIO</label><select id="scenario-picker" class="scenario-picker"></select><div id="scenario-body" class="scenario-body"></div>
+      <section class="verdict-section" aria-labelledby="verdict-title"><h3 id="verdict-title">How did it go?</h3><p>Your review notes—not automatic grading or proof of an action. Actual outcomes remain unchanged.</p><div class="verdict-controls"><button data-verdict="worked" class="button button-secondary" aria-pressed="false">Worked</button><button data-verdict="failed" class="button button-secondary" aria-pressed="false">Didn't work</button><button data-verdict="unsure" class="button button-secondary" aria-pressed="false">Unsure</button></div><p id="verdict-status" class="small-muted" aria-live="polite">Not reviewed yet</p></section>
+      <div class="drawer-navigation"><button id="previous-scenario" class="button button-secondary"><svg class="icon previous-icon"><use href="#i-chevron"/></svg>Previous</button><button id="skip-scenario" class="text-button">Skip</button><button id="next-scenario" class="button button-primary">Next<svg class="icon"><use href="#i-chevron"/></svg></button></div><p class="drawer-footnote">Independent scrolling · Keep open for recording and action review<br>No fixture reset · No verdict reports saved<br>Stop and inspect any unknown result before further actions.</p>
+      </div>
+    </aside>
+    </div>
+    <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+    <dialog id="connection-dialog" class="connection-dialog" aria-labelledby="connection-title"><p class="eyebrow">A CLEAR BOUNDARY, BEFORE WE BEGIN</p><h2 id="connection-title">Your voice stays here.<br>Your submitted text travels.</h2><p id="cloud-disclosure">Loading the exact privacy and capability disclosure…</p><p class="privacy-details">Parakeet transcribes on this Mac. Groq plans your submitted request. The local broker validates each action. You review the exact paths, text or code before every write or script run.</p><p class="dialog-warning">Groq's retention terms apply. Connection is not approval of any action. Scripts are compute-only; file/network/subprocess access is denied.</p><div class="button-row"><button id="cancel-connect" class="button button-secondary" autofocus>Not now</button><button id="confirm-connect" class="button button-primary" disabled>Connect to Groq<svg class="icon"><use href="#i-arrow"/></svg></button></div></dialog>
+    <noscript><p class="noscript-message">Enable JavaScript to use MacIntent. No microphone or cloud session starts without explicit controls.</p></noscript>
+  </body>
+</html>

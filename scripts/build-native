@@ -1,0 +1,93 @@
+#!/bin/bash
+set -euo pipefail
+[ ! -L "${BASH_SOURCE[0]}" ] || { echo 'Refusing symlinked native build launcher.' >&2; exit 1; }
+ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+cd "$ROOT"
+if [ "${MACINTENT_LAUNCHER_ACTIVE:-}" != 1 ] || [ "${MACINTENT_ROOT:-}" != "$ROOT" ]; then
+  exec /bin/bash "$ROOT/scripts/dev" /bin/bash "$ROOT/scripts/build-native" "$@"
+fi
+[ "$#" -eq 0 ] || { echo 'Usage: ./scripts/build-native' >&2; exit 2; }
+
+source_file="$ROOT/native/VoiceNative.swift"
+plist_file="$ROOT/native/Info.plist"
+base="$ROOT/.local/native"
+app="$base/VoiceAgent.app"
+contents="$app/Contents"
+binary="$contents/MacOS/voice-native"
+module_cache="$base/module-cache"
+uid="$(/usr/bin/id -u)"
+
+# Check the complete existing bundle before creating any descendants. In
+# particular, do not let creating Contents make an unfamiliar app look ours.
+for p in "$ROOT/.local" "$ROOT/.local/native" "$app" "$contents" "$contents/MacOS" "$module_cache"; do
+  [ ! -L "$p" ] || { echo "Refusing symlinked native build path" >&2; exit 1; }
+done
+for p in "$ROOT/.local" "$base" "$app" "$contents" "$contents/MacOS" "$module_cache"; do
+  if [ -e "$p" ]; then
+    mode="$(/usr/bin/stat -f %Lp "$p")"
+    [ -d "$p" ] && [ "$(/usr/bin/stat -f %u "$p")" = "$uid" ] && [ "$(( 8#$mode & 077 ))" -eq 0 ] || { echo "Refusing unfamiliar native build directory" >&2; exit 1; }
+  fi
+done
+[ -d "$ROOT/native" ] && [ ! -L "$ROOT/native" ] && [ -d "$ROOT/scripts" ] && [ ! -L "$ROOT/scripts" ] || { echo "Refusing invalid native source directory" >&2; exit 1; }
+for p in "$source_file" "$plist_file"; do
+  [ -f "$p" ] && [ ! -L "$p" ] || { echo "Refusing invalid native source input" >&2; exit 1; }
+done
+
+app_existed=0
+if [ -e "$app" ]; then app_existed=1; fi
+if [ "$app_existed" -eq 1 ]; then
+  [ -f "$contents/Info.plist" ] && [ ! -L "$contents/Info.plist" ] || { echo "Refusing unfamiliar native app bundle" >&2; exit 1; }
+  /usr/bin/cmp -s "$contents/Info.plist" "$plist_file" || { echo "Refusing to overwrite a different bundle manifest" >&2; exit 1; }
+  binary_mode="$(/usr/bin/stat -f %Lp "$binary")"
+  [ -f "$binary" ] && [ ! -L "$binary" ] && [ "$(/usr/bin/stat -f %u "$binary")" = "$uid" ] && [ "$(/usr/bin/stat -f %l "$binary")" -eq 1 ] && [ "$(( 8#$binary_mode & 077 ))" -eq 0 ] || { echo "Refusing unfamiliar native build output" >&2; exit 1; }
+  ( /usr/bin/codesign -dv --verbose=4 "$app" 2>&1 || true ) | /usr/bin/grep -Fq 'Identifier=dev.asr-agent.voice-native' || { echo "Refusing unfamiliar native app bundle" >&2; exit 1; }
+fi
+
+for p in "$base" "$module_cache"; do
+  if [ ! -e "$p" ]; then /bin/mkdir -m 700 "$p"; fi
+done
+if [ "$app_existed" -eq 1 ]; then
+  stage_bundle=""
+  staging="$contents/MacOS/voice-native.stage.$$"
+else
+  stage_bundle="$base/.VoiceAgent.app.stage.$$"
+  [ ! -e "$stage_bundle" ] && [ ! -L "$stage_bundle" ] || { echo "Refusing existing native staging directory" >&2; exit 1; }
+  /bin/mkdir -m 700 "$stage_bundle"
+  /bin/mkdir -m 700 "$stage_bundle/Contents"
+  /bin/mkdir -m 700 "$stage_bundle/Contents/MacOS"
+  /bin/cp "$plist_file" "$stage_bundle/Contents/Info.plist"
+  staging="$stage_bundle/Contents/MacOS/voice-native"
+fi
+[ ! -e "$staging" ] && [ ! -L "$staging" ] || { echo "Refusing existing native staging output" >&2; exit 1; }
+compiler_log="$base/.swift-build.$$.log"
+[ ! -e "$compiler_log" ] && [ ! -L "$compiler_log" ] || { echo "Refusing existing compiler log path" >&2; exit 1; }
+cleanup() {
+  if [ -f "$staging" ] && [ ! -L "$staging" ]; then /bin/rm -f "$staging"; fi
+  if [ -f "$compiler_log" ] && [ ! -L "$compiler_log" ]; then /bin/rm -f "$compiler_log"; fi
+  if [ -n "$stage_bundle" ]; then
+    /bin/rm -f "$stage_bundle/Contents/Info.plist"
+    /bin/rmdir "$stage_bundle/Contents/MacOS" "$stage_bundle/Contents" "$stage_bundle" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT HUP INT TERM
+
+swiftc="$(/usr/bin/xcrun --find swiftc)"
+sdk="$(/usr/bin/xcrun --show-sdk-path)"
+if ! "$swiftc" -sdk "$sdk" -module-cache-path "$module_cache" -O -framework AppKit -framework AVFoundation -framework CoreAudio -framework AudioToolbox "$source_file" -o "$staging" >"$compiler_log" 2>&1; then
+  echo "Native Swift compilation failed; compiler diagnostics were withheld." >&2
+  exit 1
+fi
+/bin/chmod 700 "$staging"
+if [ "$app_existed" -eq 1 ]; then
+  /bin/mv -f "$staging" "$binary"
+  trap - EXIT HUP INT TERM
+  if ! /usr/bin/codesign --verify --deep --strict "$app" >/dev/null 2>&1; then
+    /usr/bin/codesign --force --sign - "$app"
+  fi
+else
+  /usr/bin/codesign --force --sign - "$stage_bundle"
+  [ ! -e "$app" ] && [ ! -L "$app" ] || { echo "Refusing concurrently-created native app bundle" >&2; exit 1; }
+  /bin/mv "$stage_bundle" "$app"
+  trap - EXIT HUP INT TERM
+fi
+echo 'Compiled project-local native helper.'

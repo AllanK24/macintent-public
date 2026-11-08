@@ -1,0 +1,103 @@
+/* Live transport layer; the approved universe design remains shared. */
+.workspace-layout { --sidebar-width: 390px; min-height: 100vh; min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr); }
+.main-surface { min-width: 0; min-height: 0; grid-column: 1; grid-row: 1; }
+.workspace-layout.has-scenarios { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; grid-template-columns: minmax(0, 1fr) var(--sidebar-width); grid-template-rows: minmax(0, 1fr); }
+.has-scenarios .main-surface { height: 100%; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.app-shell { container-name: workspace; container-type: inline-size; }
+.scenario-sidebar[hidden] { display: none; }
+.scenario-sidebar { position: relative; inset: auto; grid-column: 2; grid-row: 1; display: grid; grid-template-rows: auto auto minmax(0, 1fr); width: 100%; max-width: none; height: 100%; max-height: none; min-width: 0; min-height: 0; padding: 20px; margin: 0; border-left: 1px solid #3d577d; overflow: hidden; box-shadow: -8px 0 28px #0002; }
+.sidebar-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 0 0 14px; border-bottom: 1px solid #2c4264; }
+.sidebar-heading .eyebrow { font-size: 8px; letter-spacing: 1.3px; }
+.sidebar-heading h2 { margin: 5px 0 0; font-size: 21px; letter-spacing: -.5px; }
+.scenario-sidebar .drawer-description { font-size: 11px; margin-top: 15px; }
+.scenario-sidebar .scenario-body { margin-top: 19px; }
+.scenario-sidebar .scenario-body h3 { font-size: 17px; }
+.scenario-sidebar .prompt-block { padding: 13px; }
+.scenario-sidebar .prompt-block blockquote { font-size: 14px; }
+.scenario-sidebar .scenario-progress { margin-top: 17px; }
+.scenario-sidebar progress { margin-bottom: 16px; }
+.scenario-setup { margin-bottom: 18px; font-size: 11px; color: #b5cbea; }
+.scenario-setup summary { cursor: pointer; }
+.scenario-setup .scenario-root { margin-bottom: 0; }
+.scenario-scroll { position: relative; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.sidebar-capture-status { margin: 16px 0; border: 1px solid #38577f; background: #152c48; border-radius: 8px; padding: 11px 12px; }
+.sidebar-capture-status strong { display: block; font-size: 12px; font-weight: 550; color: #c8deff; }
+.sidebar-capture-status p { margin-top: 5px; font-size: 10px; line-height: 1.7; color: #a2b9d9; }
+.sidebar-capture-status[data-phase="recording"] { border-color: #75bfd1; background: #1c52653d; }
+.sidebar-capture-status[data-phase="recording"] strong { color: #b4f2f3; }
+.sidebar-capture-status[data-phase="preparing"] { border-color: #9a8555; }
+.record-button.is-cancel { border-color: #e39bb1; background: #5b354e; color: #ffe0e8; }
+.connection-banner { justify-content: center; gap: 10px; text-align: center; }
+.connection-banner strong { color: #c6dcff; font-weight: 550; }
+.connection-indicator { display: flex; align-items: center; gap: 8px; }
+.connection-indicator .text-button { font-size: 10px; margin-left: 7px; }
+.status-dot[data-state="off"] { background: #8295b7; box-shadow: none; }
+.status-dot[data-state="busy"] { background: #edce91; }
+.correction-count { color: #9cb0d0; font-size: 9px; }
+.connection-dialog { width: min(540px, calc(100% - 28px)); max-height: calc(100dvh - 36px); border: 1px solid #46658e; border-radius: 16px; background: linear-gradient(140deg, #172a48, #0c162b); color: var(--text); padding: 28px; box-shadow: 0 22px 100px #0009; }
+.connection-dialog::backdrop { background: #030918be; backdrop-filter: blur(4px); }
+.connection-dialog h2 { font-size: 25px; margin: 12px 0; font-weight: 500; letter-spacing: -.6px; }
+.connection-dialog p { color: #b3c6e2; font-size: 12px; line-height: 1.9; }
+.connection-dialog .privacy-details { padding: 15px 17px; border: 1px solid #3b557c; border-radius: 9px; background: #0a1428aa; margin-top: 17px; }
+.connection-dialog .button-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.connection-dialog .dialog-warning { margin-top: 12px; font-size: 11px; color: #a1b7d8; }
+.connection-dialog a { color: #b7d4ff; text-decoration: underline; }
+.session-notice { border: 1px solid #6e5d3e; background: #47392242; color: #e9cfa6; border-radius: 9px; padding: 11px 14px; font-size: 12px; margin-bottom: 18px; }
+.session-notice[hidden] { display: none; }
+.approval-deadline { font-size: 11px; color: #b9cdef; margin-top: 10px; }
+.approval-deadline.is-expired { color: var(--red); }
+.review-instruction { margin-bottom: 15px; font-size: 11px; line-height: 1.8; color: #a6bddf; }
+.all-steps { margin: 14px 0 0; border-top: 1px solid #2c4264; padding-top: 12px; }
+.all-steps summary { cursor: pointer; color: #acc9ef; font-size: 11px; }
+.all-steps .plan-list { margin-top: 12px; }
+.run-digest { white-space: pre-wrap; overflow-wrap: anywhere; color: #9db7dc; font: 10px/1.7 var(--mono); }
+.field-help, .small-muted { font-size: 11px; }
+.detail-label, .field-label, .badge, .subtle-badge, .action-footnote, .results-caption, .privacy-caption, .drawer-footnote { font-size: 10px; }
+.action-identity p, .capture-copy span, .outcome-body p { font-size: 11px; }
+.app-footer { font-size: 10px; }
+.privacy-caption { justify-content: flex-start; }
+.live-progress { animation: loading-glow 1.6s ease-in-out infinite alternate; }
+.scenario-root { margin: 15px 0; }
+.scenario-root label { display: block; margin-bottom: 7px; font-size: 10px; color: #a9c1e2; }
+.scenario-root input { width: 100%; border: 1px solid #405a80; border-radius: 7px; padding: 9px 11px; background: #0b192e; color: #d6e6ff; font-size: 12px; }
+.scenario-root p { color: #9cb3d4; font-size: 10px; line-height: 1.7; margin-top: 7px; }
+.scenario-drawer .field-label { font-size: 10px; }
+.scenario-drawer .drawer-footnote { line-height: 1.8; }
+.plan-step pre { font: 11px/1.8 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; background: #0a1428; padding: 10px; border: 1px solid #2a4165; border-radius: 6px; margin: 7px 0; }
+.outcome-row[data-status="failed"] > .icon { color: var(--red); }
+@keyframes loading-glow { to { opacity: .5; } }
+@media (max-width: 520px) { .connection-banner { padding: 8px 15px; font-size: 10px; }.connection-dialog { padding: 23px; }.connection-indicator > span { display: none; }.header-actions { gap: 10px; }.connection-indicator .text-button { margin: 0; }.action-footnote { text-align: left; }.privacy-caption { font-size: 10px; } }
+@container workspace (max-width: 800px) {
+  .workspace-grid { grid-template-columns: minmax(0, 1fr); }
+  .request-panel, .action-panel { min-height: 0; }
+  .intro { flex-wrap: wrap; gap: 17px; }
+  .journey-note { display: none; }
+  .journey ol { width: 100%; gap: 10px; justify-content: space-between; }
+  .journey li:not(:last-child)::after { width: 10px; margin-left: 0; }
+  .app-footer { flex-wrap: wrap; }
+  .results-caption { display: none; }
+}
+@container workspace (max-width: 570px) {
+  .journey { padding: 11px; }
+  .journey li { font-size: 9px; gap: 5px; flex-direction: column; }
+  .journey li:not(:last-child)::after { display: none; }
+  .waveform { display: none; }
+  .preview-indicator, .key-hint { display: none; }
+  .header-actions { gap: 10px; }
+  .app-header { flex-wrap: wrap; gap: 16px; }
+  .results-panel .heading-with-icon { flex-wrap: wrap; }
+}
+@media (max-width: 760px) {
+  .workspace-layout.has-scenarios { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(210px, 42vh); grid-template-rows: minmax(0, 1fr) minmax(210px, 42dvh); }
+  .scenario-sidebar { grid-column: 1; grid-row: 2; border-left: 0; border-top: 1px solid #3d577d; box-shadow: 0 -8px 28px #0002; }
+  .sidebar-heading .eyebrow, .sidebar-capture-status p { display: none; }
+  .sidebar-heading h2 { font-size: 18px; margin: 0; }
+  .sidebar-capture-status { margin: 10px 0; padding: 9px 12px; }
+}
+@supports not (container-type: inline-size) {
+  .has-scenarios .workspace-grid { grid-template-columns: minmax(0, 1fr); }
+  .has-scenarios .app-header, .has-scenarios .intro { flex-wrap: wrap; gap: 16px; }
+  .has-scenarios .journey-note { display: none; }
+  .has-scenarios .journey ol { width: 100%; gap: 10px; flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) { .live-progress { animation: none; } }

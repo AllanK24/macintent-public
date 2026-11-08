@@ -1,0 +1,6 @@
+#!/bin/bash
+# Explicit pinned local ASR-model download only; never records or executes tools.
+set -euo pipefail
+[ ! -L "${BASH_SOURCE[0]}" ] || { echo 'Refusing symlinked model launcher.' >&2; exit 1; }
+ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+exec /bin/bash "$ROOT/scripts/dev" uv run --locked --no-sync python -m macintent.models "$@"

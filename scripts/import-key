@@ -1,0 +1,6 @@
+#!/bin/bash
+# Explicitly migrate the ignored root api.txt into protected local key storage.
+set -euo pipefail
+[ ! -L "${BASH_SOURCE[0]}" ] || { echo 'Refusing symlinked key launcher.' >&2; exit 1; }
+ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+exec /bin/bash "$ROOT/scripts/dev" uv run --locked --no-sync python -m macintent.configure_key "$@"
